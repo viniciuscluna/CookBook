@@ -7,8 +7,14 @@ import com.letscode.cookBook.enums.Categoria;
 import java.util.Scanner;
 
 public class CatalogoView {
+    public CatalogoView() {
+        controller = new Catalogo();
+        scanner = new Scanner(System.in);
+    }
+
     private final Receita NONE_FOUND = new Receita("Nenhuma receita encontrada", Categoria.PRATO_UNICO);
     private Receita receita;
+    Scanner scanner;
     Catalogo controller;
     private int curIndex = -1;
 
@@ -31,21 +37,37 @@ public class CatalogoView {
             this.receita = controller.getReceita(curIndex - 1);
             if (receita != null) curIndex--;
         }
+        show();
     }
 
     private void showSeguinte() {
         this.receita = controller.getReceita(curIndex + 1);
         if (receita != null) curIndex++;
+        show();
     }
 
     private void add() {
-        //TODO: Implement Add
+        controller.add(new NovaReceitaView().criaReceita());
+        this.receita = controller.getRandom();
+        show();
+    }
+
+    private void search() throws InterruptedException {
+        ScreenUtil.printTextLine("Digite o nome da receita");
+        Receita receita = controller.getReceita(scanner.next());
+        if (receita == null) {
+            ScreenUtil.printTextLine("Receita não encontrada");
+            Thread.sleep(2000);
+        }
+        else this.receita = receita;
+        show();
     }
 
     private void del() {
         if (curIndex >= 0) {
             controller.del(receita.getNome());
         }
+        show();
     }
 
     public void show() {
@@ -76,7 +98,12 @@ public class CatalogoView {
                     del();
                     break;
                 case "S":
-                    //TODO: Implement Search
+                    try {
+                        search();
+                    }
+                    catch (InterruptedException e) {
+
+                    }
                     break;
                 default:
                     ScreenUtil.printTextLine("Opção inválida", 80);
